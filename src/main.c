@@ -44,7 +44,7 @@ static uint8_t boxes[WORDS][WORD_LENGTH];
 static char letters[WORDS][WORD_LENGTH];
 
 /* puzzle word */
-static char *word;
+static const char *word;
 
 void setup(void)
 {
@@ -60,11 +60,8 @@ void setup(void)
 	srand(rtc_Time());
 	rtc_Disable();
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
 	/* pick random word */
 	word = puzzle_words[randInt(0, LEN(puzzle_words) - 1)];
-#pragma clang diagnostic pop
 }
 
 void fill_box(uint8_t y, uint8_t x)

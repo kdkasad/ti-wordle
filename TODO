@@ -1,0 +1,10 @@
+Must fix:
+
+	- Print puzzle word after 6 incorrect guesses
+
+	- Show which line/box the cursor is currently on
+
+Probably won't fix:
+
+	- Implement piecewise compression of valid word list to allow for all
+	  10k+ possible words

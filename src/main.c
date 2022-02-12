@@ -30,14 +30,17 @@
 /* function declarations */
 static int16_t binsearch(const char *word, const char **list, int16_t start, int16_t end);
 static void draw_boxes(void);
-static void draw_letter(uint8_t y, uint8_t x, char c);
-static void fill_box(uint8_t y, uint8_t x);
+static void draw_letter(uint8_t i, uint8_t j, char c);
+static void fill_box(uint8_t i, uint8_t j);
+static void handle_correct_guess(void);
+static void handle_incorrect_guess(void);
+static void handle_invalid_guess(void);
 static void handle_key(char c);
 static void setup(void);
 static inline bool is_valid(const char *word);
 
 /* keysym to character mapping */
-const char *charmap = "\0\0\0\0\0\0\0\0\0\0\"WRMH\0\0?[VQLG\0\0:ZUPKFC\0 YTOJEB\0\0XSNIDA\0\0\0\0\0\0\0\0";
+static const char *const charmap = "\0\0\0\0\0\0\0\0\0\0\"WRMH\0\0?[VQLG\0\0:ZUPKFC\0 YTOJEB\0\0XSNIDA\0\0\0\0\0\0\0\0";
 
 /* color of each box */
 static uint8_t boxes[WORDS][WORD_LENGTH];
@@ -46,12 +49,15 @@ static char letters[WORDS][WORD_LENGTH];
 /* puzzle word */
 static const char *word;
 
+/* current position */
+static uint8_t y, x;
+
 void setup(void)
 {
-	for (uint8_t y = 0; y < WORDS; y++) {
-		for (uint8_t x = 0; x < WORD_LENGTH; x++) {
-			boxes[y][x] = GRAY;
-			letters[y][x] = ' ';
+	for (uint8_t i = 0; i < WORDS; i++) {
+		for (uint8_t j = 0; j < WORD_LENGTH; j++) {
+			boxes[i][j] = GRAY;
+			letters[i][j] = ' ';
 		}
 	}
 
@@ -59,14 +65,16 @@ void setup(void)
 
 	/* pick random word */
 	word = puzzle_words[randInt(0, LEN(puzzle_words) - 1)];
+
+	x = y = 0;
 }
 
-void fill_box(uint8_t y, uint8_t x)
+void fill_box(uint8_t i, uint8_t j)
 {
-	gfx_SetColor(boxes[y][x]);
+	gfx_SetColor(boxes[i][j]);
 	gfx_FillRectangle(
-			LEFT + x * (BOX_SIZE + BOX_MARGIN),
-			TOP + y * (BOX_SIZE + BOX_MARGIN),
+			LEFT + j * (BOX_SIZE + BOX_MARGIN),
+			TOP + i * (BOX_SIZE + BOX_MARGIN),
 			BOX_SIZE,
 			BOX_SIZE
 			);
@@ -74,25 +82,81 @@ void fill_box(uint8_t y, uint8_t x)
 
 void draw_boxes(void)
 {
-	for (uint8_t y = 0; y < WORDS; y++) {
-		for (uint8_t x = 0; x < WORD_LENGTH; x++) {
-			fill_box(y, x);
+	for (uint8_t i = 0; i < WORDS; i++) {
+		for (uint8_t j = 0; j < WORD_LENGTH; j++) {
+			fill_box(i, j);
 		}
 	}
 }
 
-void draw_letter(uint8_t y, uint8_t x, char c)
+void draw_letter(uint8_t i, uint8_t j, char c)
 {
 	gfx_SetTextFGColor(WHITE);
-	gfx_SetTextBGColor(boxes[y][x]);
-	gfx_SetTextTransparentColor(boxes[y][x]);
+	gfx_SetTextBGColor(boxes[i][j]);
+	gfx_SetTextTransparentColor(boxes[i][j]);
 
-	/* position cursor in box (x, y) */
+	/* position cursor in row i box j */
 	gfx_SetTextXY(
-			LEFT + x * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - gfx_GetCharWidth(c)) / 2,
-			TOP + y * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - LETTER_HEIGHT) / 2
+			LEFT + j * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - gfx_GetCharWidth(c)) / 2,
+			TOP + i * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - LETTER_HEIGHT) / 2
 		     );
 	gfx_PrintChar(c);
+}
+
+void handle_correct_guess(void)
+{
+	for (uint8_t i = 0; i < WORD_LENGTH; i++)
+		boxes[y][i] = GREEN;
+
+	/* draw new boxes */
+	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
+		fill_box(y, i);
+		draw_letter(y, i, letters[y][i]);
+	}
+
+	y = WORDS;
+	x = 0;
+}
+
+void handle_invalid_guess(void)
+{
+	for (uint8_t i = 0; i < WORD_LENGTH; i++)
+		boxes[y][i] = RED;
+
+	/* draw new boxes */
+	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
+		fill_box(y, i);
+		draw_letter(y, i, letters[y][i]);
+	}
+}
+
+void handle_incorrect_guess(void)
+{
+	uint8_t freq[26] = { 0 };
+
+	/* count occurrences of each letter in puzzle word */
+	for (uint8_t i = 0; i < WORD_LENGTH; i++)
+		freq[word[i] - 'A']++;
+
+	/* highlight boxes */
+	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
+		if (letters[y][i] == word[i]) {
+			boxes[y][i] = GREEN;
+			freq[letters[y][i] - 'A']--;
+		} else if (freq[letters[y][i] - 'A'] > 0) {
+			boxes[y][i] = YELLOW;
+			freq[letters[y][i] - 'A']--;
+		}
+	}
+
+	/* draw new boxes */
+	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
+		fill_box(y, i);
+		draw_letter(y, i, letters[y][i]);
+	}
+
+	x = 0;
+	y++;
 }
 
 #define HKEY_ENTER '\x01'
@@ -100,68 +164,17 @@ void draw_letter(uint8_t y, uint8_t x, char c)
 #define HKEY_CLEAR '\x03'
 void handle_key(char c)
 {
-	static uint8_t x = 0;
-	static uint8_t y = 0;
 	static bool last_guess_invalid = false;
 
 	if (c == HKEY_ENTER) { /* enter is pressed */
 		if (x == WORD_LENGTH) {
 			if (!strncmp(letters[y], word, WORD_LENGTH)) {
-				/* correct guess */
-
-				for (uint8_t i = 0; i < WORD_LENGTH; i++)
-					boxes[y][i] = GREEN;
-
-				/* draw new boxes */
-				for (uint8_t i = 0; i < WORD_LENGTH; i++) {
-					fill_box(y, i);
-					draw_letter(y, i, letters[y][i]);
-				}
-
-				y = WORDS;
-				x = 0;
-
+				handle_correct_guess();
 			} else if (!is_valid(letters[y])) {
-				/* invalid word */
-
-				for (uint8_t i = 0; i < WORD_LENGTH; i++)
-					boxes[y][i] = RED;
+				handle_invalid_guess();
 				last_guess_invalid = true;
-
-				/* draw new boxes */
-				for (uint8_t i = 0; i < WORD_LENGTH; i++) {
-					fill_box(y, i);
-					draw_letter(y, i, letters[y][i]);
-				}
-
 			} else {
-				/* valid word, incorrect guess */
-
-				uint8_t freq[26] = { 0 };
-
-				/* count occurrences of each letter in puzzle word */
-				for (uint8_t i = 0; i < WORD_LENGTH; i++)
-					freq[word[i] - 'A']++;
-
-				/* highlight boxes */
-				for (uint8_t i = 0; i < WORD_LENGTH; i++) {
-					if (letters[y][i] == word[i]) {
-						boxes[y][i] = GREEN;
-						freq[letters[y][i] - 'A']--;
-					} else if (freq[letters[y][i] - 'A'] > 0) {
-						boxes[y][i] = YELLOW;
-						freq[letters[y][i] - 'A']--;
-					}
-				}
-
-				/* draw new boxes */
-				for (uint8_t i = 0; i < WORD_LENGTH; i++) {
-					fill_box(y, i);
-					draw_letter(y, i, letters[y][i]);
-				}
-
-				x = 0;
-				y++;
+				handle_incorrect_guess();
 			}
 
 		}

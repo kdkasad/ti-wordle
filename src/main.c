@@ -48,8 +48,6 @@ static const char *word;
 
 void setup(void)
 {
-	rtc_Enable(0);
-
 	for (uint8_t y = 0; y < WORDS; y++) {
 		for (uint8_t x = 0; x < WORD_LENGTH; x++) {
 			boxes[y][x] = GRAY;
@@ -58,7 +56,6 @@ void setup(void)
 	}
 
 	srand(rtc_Time());
-	rtc_Disable();
 
 	/* pick random word */
 	word = puzzle_words[randInt(0, LEN(puzzle_words) - 1)];

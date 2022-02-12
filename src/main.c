@@ -4,6 +4,13 @@
 
 #include "words.h"
 
+#ifdef DEBUG
+#include <debug.h>
+#define debug(...) dbg_sprintf(dbgout, __VA_ARGS__)
+#else
+#define debug(...) (void *)0
+#endif
+
 #define LEN(x) (sizeof(x) / sizeof(*x))
 
 #define DEFAULT_LETTER_HEIGHT 8

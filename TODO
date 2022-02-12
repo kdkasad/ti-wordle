@@ -1,7 +1,5 @@
 Must fix:
 
-	- Print puzzle word after 6 incorrect guesses
-
 	- Show which line/box the cursor is currently on
 
 Probably won't fix:

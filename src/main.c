@@ -43,6 +43,7 @@ static void handle_correct_guess(void);
 static void handle_incorrect_guess(void);
 static void handle_invalid_guess(void);
 static void handle_key(char c);
+static void reveal_puzzle_word(void);
 static void setup(void);
 static inline bool is_valid(const char *word);
 
@@ -164,6 +165,23 @@ void handle_incorrect_guess(void)
 
 	x = 0;
 	y++;
+
+	if (y == WORDS) /* game over */
+		reveal_puzzle_word();
+}
+
+void reveal_puzzle_word(void)
+{
+	char msg[] = "The word is:  \0\0\0\0\0";
+	strcat(msg, word);
+
+	gfx_SetTextFGColor(BLACK);
+	gfx_SetTextBGColor(WHITE);
+	gfx_SetTextTransparentColor(WHITE);
+	gfx_PrintStringXY(msg,
+			(LCD_WIDTH - gfx_GetStringWidth(msg)) / 2,
+			LCD_HEIGHT - (LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 4 - LETTER_HEIGHT / 2
+			);
 }
 
 #define HKEY_ENTER '\x01'

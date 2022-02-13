@@ -1,8 +1,5 @@
 Must fix:
 
-	- Show message instead of highlighting boxes when an invalid word is
-	  entered.
-
 	- Adjust UI layout to optimize usage of space
 
 	- Document functions in sources

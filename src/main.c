@@ -134,6 +134,8 @@ void handle_correct_guess(void)
 
 void handle_invalid_guess(void)
 {
+	print_status_message("Not in word list.");
+
 	for (uint8_t i = 0; i < WORD_LENGTH; i++)
 		boxes[y][i] = COLOR_INVALID;
 
@@ -233,8 +235,11 @@ void handle_key(char c)
 		letters[y][x] = ' ';
 
 		/* if previous guess was wrong, clear the red boxes since the
-		 * user has acknowledged the message */
+		 * user has acknowledged the message. also clear the status
+		 * message and reinstate the title. */
 		if (boxes[y][0] == COLOR_INVALID) {
+			clear_status_message();
+			print_title();
 			for (uint8_t i = 0; i < WORD_LENGTH; i++) {
 				boxes[y][i] = COLOR_NONE;
 				fill_box(y, i);
@@ -245,6 +250,14 @@ void handle_key(char c)
 			draw_letter(y, x, letters[y][x]);
 		}
 	} else if (c == HKEY_CLEAR) {
+		/* if previous guess was wrong, clear the red boxes since the
+		 * user has acknowledged the message. also clear the status
+		 * message and reinstate the title. */
+		if (boxes[y][0] == COLOR_INVALID) {
+			clear_status_message();
+			print_title();
+		}
+
 		for (x = 0; x < WORD_LENGTH; x++) {
 			letters[y][x] = ' ';
 			boxes[y][x] = COLOR_NONE;

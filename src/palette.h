@@ -1,3 +1,14 @@
+/**
+ * TI Wordle - src/palette.h
+ *
+ * Copyright (C) 2022 Kian Kasad
+ *
+ * This file is made available under a modified BSD license. See the provided
+ * LICENSE file for more information.
+ *
+ * SPDX-License-Identifier: BSD-2-Clause-Patent
+ */
+
 #ifndef __PALETTE_H__
 #define __PALETTE_H__
 

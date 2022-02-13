@@ -2,10 +2,6 @@ name: Build program
 
 on:
   push:
-    tags:
-      - v*
-    branches:
-      - "*"
     paths:
       - src/**
       - include/**
@@ -16,6 +12,7 @@ env:
   CEDEV_REPO: CE-Programming/toolchain
   CEDEV_PATH: ${{github.workspace}}/CEdev
   WORDLE_PATH: ${{github.workspace}}/ti-wordle
+  RELEASE_NAME_PREFIX: TI Wordle
 
 jobs:
   build:
@@ -39,7 +36,15 @@ jobs:
         run: |
           tar -zxf ${{ steps.cedev-download.outputs.file-path }} CEdev
 
+      - name: Checkout repository (at tag)
+        if: github.ref_type == 'tag'
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref_name }}
+          path: ${{ env.WORDLE_PATH }}
+
       - name: Checkout repository
+        if: github.ref_type != 'tag'
         uses: actions/checkout@v2
         with:
           path: ${{ env.WORDLE_PATH }}
@@ -52,8 +57,24 @@ jobs:
         run: |
           make -C $WORDLE_PATH
 
-      - name: Upload program binary
+      - name: Upload program binary as artifact
         uses: actions/upload-artifact@v2
         with:
           name: wordle-exe
           path: ${{ env.WORDLE_PATH }}/bin/*.8xp
+
+      - name: Get tag body text
+        id: tag-body
+        if: github.ref_type == 'tag'
+        run: |
+          printf '%s' '::set-output name=tag-body::'
+          git -C $WORDLE_PATH cat-file tag ${{ github.ref_name }} | sed ':a ; 1,5d; /^-----BEGIN PGP SIGNATURE-----$/,$d; s/%/%25/g; s/$/%0A/g' | tr -d '\n'
+
+      - name: Create release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.RELEASE_NAME_PREFIX }} ${{ github.ref_name }}
+          body: ${{ steps.tag-body.outputs.tag-body }}
+          files: ${{ env.WORDLE_PATH }}/bin/*.8xp
+          generate_release_notes: false

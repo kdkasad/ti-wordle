@@ -1,6 +1,11 @@
 Must fix:
 
-	- Show which line/box the cursor is currently on
+	- Show message instead of highlighting boxes when an invalid word is
+	  entered.
+
+	- Adjust UI layout to optimize usage of space
+
+	- Document functions in sources
 
 Probably won't fix:
 

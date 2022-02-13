@@ -41,6 +41,7 @@
 
 /* function declarations */
 static int16_t binsearch(const char *word, const char **list, int16_t start, int16_t end);
+static void clear_status_message(void);
 static void draw_boxes(void);
 static void draw_letter(uint8_t i, uint8_t j, char c);
 static void fill_box(uint8_t i, uint8_t j);
@@ -49,7 +50,7 @@ static void handle_incorrect_guess(void);
 static void handle_invalid_guess(void);
 static void handle_key(char c);
 static inline bool is_valid(const char *word);
-static void reveal_puzzle_word(void);
+static void print_status_message(const char *msg);
 static void setup(void);
 
 /* keysym to character mapping */
@@ -172,21 +173,32 @@ void handle_incorrect_guess(void)
 	x = 0;
 	y++;
 
-	if (y == WORDS) /* game over */
-		reveal_puzzle_word();
+	/* if game over, reveal puzzle word */
+	if (y == WORDS) {
+		char msg[] = "The word was:  \0\0\0\0\0";
+		strcat(msg, word);
+		print_status_message(msg);
+	}
 }
 
-void reveal_puzzle_word(void)
+void print_status_message(const char *msg)
 {
-	char msg[] = "The word is:  \0\0\0\0\0";
-	strcat(msg, word);
-
+	clear_status_message();
 	gfx_SetTextFGColor(BLACK);
 
 	gfx_PrintStringXY(msg,
 			(LCD_WIDTH - gfx_GetStringWidth(msg)) / 2,
 			LCD_HEIGHT - (LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 4 - LETTER_HEIGHT / 2
 			);
+}
+
+void clear_status_message(void)
+{
+	gfx_SetColor(WHITE);
+	gfx_FillRectangle(0,
+			(LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 4 - LETTER_HEIGHT / 2,
+			LCD_WIDTH,
+			LETTER_HEIGHT);
 }
 
 #define HKEY_ENTER '\x01'

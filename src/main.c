@@ -2,6 +2,7 @@
 #include <string.h>
 #include <tice.h>
 
+#include "palette.h"
 #include "words.h"
 
 #ifdef DEBUG
@@ -22,14 +23,6 @@
 
 #define WORD_LENGTH 5
 #define WORDS       6
-
-#define GREEN  4
-#define RED    160
-#define BLACK  0
-#define BROWN  32
-#define GRAY   BLACK /* 181 for light gray */
-#define YELLOW 228
-#define WHITE  255
 
 #define TOP ((LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 2)
 #define LEFT ((LCD_WIDTH - WORD_LENGTH * BOX_SIZE - (WORD_LENGTH - 1) * BOX_MARGIN) / 2)
@@ -64,7 +57,7 @@ void setup(void)
 {
 	for (uint8_t i = 0; i < WORDS; i++) {
 		for (uint8_t j = 0; j < WORD_LENGTH; j++) {
-			boxes[i][j] = GRAY;
+			boxes[i][j] = LIGHTGRAY;
 			letters[i][j] = ' ';
 		}
 	}
@@ -100,9 +93,9 @@ void draw_boxes(void)
 void draw_letter(uint8_t i, uint8_t j, char c)
 {
 	/* set fg to white and bg to transparent */
-	gfx_SetTextFGColor(WHITE);
-	gfx_SetTextBGColor(BLACK);
-	gfx_SetTextTransparentColor(BLACK);
+	gfx_SetTextFGColor(BLACK);
+	gfx_SetTextBGColor(WHITE);
+	gfx_SetTextTransparentColor(WHITE);
 
 	/* position cursor in row i box j */
 	gfx_SetTextXY(
@@ -216,7 +209,7 @@ void handle_key(char c)
 		if (last_guess_invalid) {
 			last_guess_invalid = false;
 			for (uint8_t i = 0; i < WORD_LENGTH; i++) {
-				boxes[y][i] = GRAY;
+				boxes[y][i] = LIGHTGRAY;
 				fill_box(y, i);
 				draw_letter(y, i, letters[y][i]);
 			}
@@ -228,7 +221,7 @@ void handle_key(char c)
 		last_guess_invalid = false;
 		for (x = 0; x < WORD_LENGTH; x++) {
 			letters[y][x] = ' ';
-			boxes[y][x] = GRAY;
+			boxes[y][x] = LIGHTGRAY;
 			fill_box(y, x);
 		}
 		x = 0;
@@ -281,13 +274,16 @@ int main(void)
 
 	gfx_Begin();
 
+	/* set up palette */
+	gfx_SetPalette(wordle_colors, sizeof(wordle_colors), 0);
+
 	/* text config */
 	gfx_SetTextConfig(gfx_text_noclip);
 	gfx_SetTextScale(2, 2);
 	gfx_SetMonospaceFont(0);
 
 	/* clear screen */
-	gfx_FillScreen(255);
+	gfx_FillScreen(WHITE);
 
 	draw_boxes();
 

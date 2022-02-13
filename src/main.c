@@ -189,7 +189,6 @@ void reveal_puzzle_word(void)
 #define HKEY_CLEAR '\x03'
 void handle_key(char c)
 {
-	static bool last_guess_invalid = false;
 
 	if (c == HKEY_ENTER) { /* enter is pressed */
 		if (x == WORD_LENGTH) {
@@ -197,7 +196,6 @@ void handle_key(char c)
 				handle_correct_guess();
 			} else if (!is_valid(letters[y])) {
 				handle_invalid_guess();
-				last_guess_invalid = true;
 			} else {
 				handle_incorrect_guess();
 			}
@@ -210,8 +208,7 @@ void handle_key(char c)
 		x--;
 		letters[y][x] = ' ';
 
-		if (last_guess_invalid) {
-			last_guess_invalid = false;
+		if (boxes[y][0] == COLOR_INVALID) {
 			for (uint8_t i = 0; i < WORD_LENGTH; i++) {
 				boxes[y][i] = COLOR_NONE;
 				fill_box(y, i);
@@ -222,7 +219,6 @@ void handle_key(char c)
 			draw_letter(y, x, letters[y][x]);
 		}
 	} else if (c == HKEY_CLEAR) {
-		last_guess_invalid = false;
 		for (x = 0; x < WORD_LENGTH; x++) {
 			letters[y][x] = ' ';
 			boxes[y][x] = COLOR_NONE;

@@ -216,8 +216,8 @@ void print_title(void)
 {
 	clear_status_message();
 	gfx_SetTextFGColor(BLACK);
-	gfx_PrintStringXY(PROGNAME,
-			(LCD_WIDTH - gfx_GetStringWidth(PROGNAME)) / 2,
+	gfx_PrintStringXY(TITLE,
+			(LCD_WIDTH - gfx_GetStringWidth(TITLE)) / 2,
 			TOP / 2 - LETTER_HEIGHT / 2
 			);
 }

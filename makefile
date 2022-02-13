@@ -3,13 +3,14 @@
 # ----------------------------
 
 NAME = WORDLE
+TITLE = TI WORDLE
 ICON = icon.png
 DESCRIPTION = "Wordle"
 COMPRESSED = YES
 ARCHIVED = NO
 
-CFLAGS = -Wall -Wextra -pedantic -Oz -DPROGNAME="\"$(NAME)\""
-CXXFLAGS = -Wall -Wextra -pedantic -Oz -DPROGNAME="\"$(NAME)\""
+CFLAGS = -Wall -Wextra -pedantic -Oz -DPROGNAME="\"$(NAME)\"" -DTITLE="\"$(TITLE)\""
+CXXFLAGS = -Wall -Wextra -pedantic -Oz -DPROGNAME="\"$(NAME)\"" -DTITLE="\"$(TITLE)\""
 
 # ----------------------------
 

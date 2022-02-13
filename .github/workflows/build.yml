@@ -1,0 +1,59 @@
+name: Build program
+
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - "*"
+    paths:
+      - src/**
+      - include/**
+      - makefile
+      - .github/workflows/**
+
+env:
+  CEDEV_REPO: CE-Programming/toolchain
+  CEDEV_PATH: ${{github.workspace}}/CEdev
+  WORDLE_PATH: ${{github.workspace}}/ti-wordle
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Fetch CE-Programming toolchain version
+        id: cedev-version
+        run: |
+          curl -sSL https://api.github.com/repos/${{ env.CEDEV_REPO }}/releases/latest | jq -r '"CEDEV_TAG=\(.tag_name)"' >> $GITHUB_ENV
+
+      - name: Download CE-Programming toolchain
+        id: cedev-download
+        uses: carlosperate/download-file-action@v1.0.3
+        with:
+          file-url: https://github.com/${{ env.CEDEV_REPO }}/releases/download/${{ env.CEDEV_TAG }}/linux_CEdev_${{ env.CEDEV_TAG }}.tar.gz
+          file-name: CEdev.tar.gz
+
+      - name: Extract CE-Programming toolchain
+        run: |
+          tar -zxf ${{ steps.cedev-download.outputs.file-path }} CEdev
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.WORDLE_PATH }}
+
+      - name: Add toolchain to executable path
+        run: |
+          echo "$CEDEV_PATH/bin" >> $GITHUB_PATH
+
+      - name: Build program
+        run: |
+          make -C $WORDLE_PATH
+
+      - name: Upload program binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: wordle-exe
+          path: ${{ env.WORDLE_PATH }}/bin/*.8xp

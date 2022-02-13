@@ -99,9 +99,10 @@ void draw_boxes(void)
 
 void draw_letter(uint8_t i, uint8_t j, char c)
 {
+	/* set fg to white and bg to transparent */
 	gfx_SetTextFGColor(WHITE);
-	gfx_SetTextBGColor(boxes[i][j]);
-	gfx_SetTextTransparentColor(boxes[i][j]);
+	gfx_SetTextBGColor(BLACK);
+	gfx_SetTextTransparentColor(BLACK);
 
 	/* position cursor in row i box j */
 	gfx_SetTextXY(
@@ -175,9 +176,11 @@ void reveal_puzzle_word(void)
 	char msg[] = "The word is:  \0\0\0\0\0";
 	strcat(msg, word);
 
+	/* set fg to black and bg to transparent */
 	gfx_SetTextFGColor(BLACK);
 	gfx_SetTextBGColor(WHITE);
 	gfx_SetTextTransparentColor(WHITE);
+
 	gfx_PrintStringXY(msg,
 			(LCD_WIDTH - gfx_GetStringWidth(msg)) / 2,
 			LCD_HEIGHT - (LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 4 - LETTER_HEIGHT / 2

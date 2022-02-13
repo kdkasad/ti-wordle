@@ -51,6 +51,7 @@ static void handle_invalid_guess(void);
 static void handle_key(char c);
 static inline bool is_valid(const char *word);
 static void print_status_message(const char *msg);
+static void print_title(void);
 static void setup(void);
 
 /* keysym to character mapping */
@@ -201,6 +202,11 @@ void clear_status_message(void)
 			LETTER_HEIGHT);
 }
 
+void print_title(void)
+{
+	print_status_message(PROGNAME);
+}
+
 #define HKEY_ENTER '\x01'
 #define HKEY_DEL   '\x02'
 #define HKEY_CLEAR '\x03'
@@ -304,6 +310,7 @@ int main(void)
 	/* clear screen */
 	gfx_FillScreen(WHITE);
 
+	print_title();
 	draw_boxes();
 
 	sk_key_t c;

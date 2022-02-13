@@ -14,7 +14,14 @@
 A clone of [Wordle](https://powerlanguage.co.uk/wordle/) for TI-84/83 graphing
 calculators.
 
-## Building
+## Downloading the program
+
+The compiled binary for TI Wordle is available on the [releases
+page](https://github.com/kdkasad/ti-wordle/releases) of the project's GitHub
+repository. Download the `WORDLE.8xp` file and upload it to your calculator
+(see [Installing](#installing)).
+
+## Building from sources
 
 To build TI Wordle, install the [CE-Programming
 toolchain](https://github.com/CE-Programming/toolchain/), then run `make` in

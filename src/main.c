@@ -43,6 +43,7 @@
 
 /* function declarations */
 static int16_t binsearch(const char *word, const char **list, int16_t start, int16_t end);
+static void clear_copyright(void);
 static void clear_status_message(void);
 static void draw_boxes(void);
 static void draw_letter(uint8_t i, uint8_t j, char c);
@@ -52,6 +53,7 @@ static void handle_incorrect_guess(void);
 static void handle_invalid_guess(void);
 static void handle_key(char c);
 static inline bool is_valid(const char *word);
+static void print_copyright(void);
 static void print_status_message(const char *msg);
 static void print_title(void);
 static void setup(void);
@@ -222,11 +224,35 @@ void print_title(void)
 			);
 }
 
+void print_copyright(void)
+{
+	char str[] = "Copyright (C) " YEAR " " AUTHOR;
+	gfx_SetTextFGColor(BLACK);
+	gfx_SetTextScale(1, 1);
+	gfx_PrintStringXY(str,
+			(LCD_WIDTH - gfx_GetStringWidth(str)) / 2,
+			LCD_HEIGHT - DEFAULT_LETTER_HEIGHT - 1);
+	gfx_SetTextScale(FONT_SCALE, FONT_SCALE);
+}
+
+void clear_copyright(void)
+{
+	gfx_SetColor(WHITE);
+	gfx_FillRectangle(0, LCD_HEIGHT - DEFAULT_LETTER_HEIGHT - 1,
+			LCD_WIDTH, LCD_HEIGHT);
+}
+
 #define HKEY_ENTER '\x01'
 #define HKEY_DEL   '\x02'
 #define HKEY_CLEAR '\x03'
 void handle_key(char c)
 {
+	static bool first_press = true;
+	if (first_press) {
+		clear_copyright();
+		first_press = false;
+	}
+
 	if (y == WORDS)
 		return;
 
@@ -336,6 +362,7 @@ int main(void)
 	/* clear screen */
 	gfx_FillScreen(WHITE);
 
+	print_copyright();
 	print_title();
 	draw_boxes();
 

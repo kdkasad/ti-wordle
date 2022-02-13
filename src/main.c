@@ -19,17 +19,19 @@
 #define DEFAULT_LETTER_HEIGHT 8
 
 /* UI sizes */
-#define BOX_SIZE      20
-#define BOX_MARGIN    4
-#define FONT_SCALE    2    /* results in 16px letter height */
-#define LETTER_HEIGHT (FONT_SCALE * DEFAULT_LETTER_HEIGHT)
+#define BOX_SIZE            26
+#define BOX_MARGIN          4
+#define FONT_SCALE          3
+#define LETTER_HEIGHT       (FONT_SCALE * DEFAULT_LETTER_HEIGHT)
+#define SMALL_FONT_SCALE    2
+#define SMALL_LETTER_HEIGHT (SMALL_FONT_SCALE * DEFAULT_LETTER_HEIGHT)
 
 /* Define word parameters */
 #define WORD_LENGTH 5
 #define WORDS       6
 
 /* Coordinate of top-left corner of grid */
-#define TOP ((LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 2)
+#define TOP ((LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN - LETTER_HEIGHT) * 2 / 3 + LETTER_HEIGHT)
 #define LEFT ((LCD_WIDTH - WORD_LENGTH * BOX_SIZE - (WORD_LENGTH - 1) * BOX_MARGIN) / 2)
 
 /* color definitions for letter states */
@@ -111,8 +113,8 @@ void draw_letter(uint8_t i, uint8_t j, char c)
 
 	/* position cursor in row i box j */
 	gfx_SetTextXY(
-			LEFT + j * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - gfx_GetCharWidth(c)) / 2,
-			TOP + i * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - LETTER_HEIGHT) / 2
+			LEFT + j * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - gfx_GetCharWidth(c)) / 2 + 1,
+			TOP + i * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - LETTER_HEIGHT) / 2 + 1
 		     );
 	gfx_PrintChar(c);
 }
@@ -188,25 +190,31 @@ void print_status_message(const char *msg)
 {
 	clear_status_message();
 	gfx_SetTextFGColor(BLACK);
-
+	gfx_SetTextScale(SMALL_FONT_SCALE, SMALL_FONT_SCALE);
 	gfx_PrintStringXY(msg,
 			(LCD_WIDTH - gfx_GetStringWidth(msg)) / 2,
-			LCD_HEIGHT - (LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 4 - LETTER_HEIGHT / 2
+			TOP / 2 - SMALL_LETTER_HEIGHT / 2
 			);
+	gfx_SetTextScale(FONT_SCALE, FONT_SCALE);
 }
 
 void clear_status_message(void)
 {
 	gfx_SetColor(WHITE);
 	gfx_FillRectangle(0,
-			(LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 4 - LETTER_HEIGHT / 2,
+			TOP / 2 - LETTER_HEIGHT / 2,
 			LCD_WIDTH,
 			LETTER_HEIGHT);
 }
 
 void print_title(void)
 {
-	print_status_message(PROGNAME);
+	clear_status_message();
+	gfx_SetTextFGColor(BLACK);
+	gfx_PrintStringXY(PROGNAME,
+			(LCD_WIDTH - gfx_GetStringWidth(PROGNAME)) / 2,
+			TOP / 2 - LETTER_HEIGHT / 2
+			);
 }
 
 #define HKEY_ENTER '\x01'
@@ -315,7 +323,7 @@ int main(void)
 
 	/* text config */
 	gfx_SetTextConfig(gfx_text_noclip);
-	gfx_SetTextScale(2, 2);
+	gfx_SetTextScale(FONT_SCALE, FONT_SCALE);
 	gfx_SetMonospaceFont(0);
 	gfx_SetTextBGColor(TRANSPARENT);
 	gfx_SetTextTransparentColor(TRANSPARENT);

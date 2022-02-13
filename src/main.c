@@ -12,18 +12,23 @@
 #define debug(...) (void *)0
 #endif
 
+/* Length of an array */
 #define LEN(x) (sizeof(x) / sizeof(*x))
 
+/* Default letter height in graphx library */
 #define DEFAULT_LETTER_HEIGHT 8
 
+/* UI sizes */
 #define BOX_SIZE      20
 #define BOX_MARGIN    4
 #define FONT_SCALE    2    /* results in 16px letter height */
 #define LETTER_HEIGHT (FONT_SCALE * DEFAULT_LETTER_HEIGHT)
 
+/* Define word parameters */
 #define WORD_LENGTH 5
 #define WORDS       6
 
+/* Coordinate of top-left corner of grid */
 #define TOP ((LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 2)
 #define LEFT ((LCD_WIDTH - WORD_LENGTH * BOX_SIZE - (WORD_LENGTH - 1) * BOX_MARGIN) / 2)
 
@@ -43,9 +48,9 @@ static void handle_correct_guess(void);
 static void handle_incorrect_guess(void);
 static void handle_invalid_guess(void);
 static void handle_key(char c);
+static inline bool is_valid(const char *word);
 static void reveal_puzzle_word(void);
 static void setup(void);
-static inline bool is_valid(const char *word);
 
 /* keysym to character mapping */
 static const char *const charmap = "\0\0\0\0\0\0\0\0\0\0\"WRMH\0\0?[VQLG\0\0:ZUPKFC\0 YTOJEB\0\0XSNIDA\0\0\0\0\0\0\0\0";
@@ -193,16 +198,15 @@ void handle_key(char c)
 		return;
 
 	if (c == HKEY_ENTER) { /* enter is pressed */
-		if (x == WORD_LENGTH) {
-			if (!strncmp(letters[y], word, WORD_LENGTH)) {
-				handle_correct_guess();
-			} else if (!is_valid(letters[y])) {
-				handle_invalid_guess();
-			} else {
-				handle_incorrect_guess();
-			}
+		if (x != WORD_LENGTH)
+			return;
 
-		}
+		if (!strncmp(letters[y], word, WORD_LENGTH))
+			handle_correct_guess();
+		else if (!is_valid(letters[y]))
+			handle_invalid_guess();
+		else
+			handle_incorrect_guess();
 	} else if (c == HKEY_DEL) {
 		if (x == 0)
 			return;
@@ -210,6 +214,8 @@ void handle_key(char c)
 		x--;
 		letters[y][x] = ' ';
 
+		/* if previous guess was wrong, clear the red boxes since the
+		 * user has acknowledged the message */
 		if (boxes[y][0] == COLOR_INVALID) {
 			for (uint8_t i = 0; i < WORD_LENGTH; i++) {
 				boxes[y][i] = COLOR_NONE;
@@ -227,11 +233,10 @@ void handle_key(char c)
 			fill_box(y, x);
 		}
 		x = 0;
-	} else {
-		/* letter A-Z */
-
+	} else { /* letter A-Z */
 		if (x == WORD_LENGTH)
 			return;
+
 		letters[y][x] = c;
 		draw_letter(y, x, c);
 		x++;
@@ -291,16 +296,14 @@ int main(void)
 
 	sk_key_t c;
 	while ((c = os_GetCSC()) != sk_2nd) {
-		if (c == sk_Enter) {
+		if (c == sk_Enter)
 			handle_key(HKEY_ENTER);
-		} else if (c == sk_Clear) {
+		else if (c == sk_Clear)
 			handle_key(HKEY_CLEAR);
-		} else if (c == sk_Del) {
+		else if (c == sk_Del)
 			handle_key(HKEY_DEL);
-		} else if (charmap[c] >= 'A' && charmap[c] <= 'Z') {
-			/* keypress is a letter */
-			handle_key(charmap[c]);
-		}
+		else if (charmap[c] >= 'A' && charmap[c] <= 'Z')
+			handle_key(charmap[c]); /* keypress is a letter */
 	}
 
 	gfx_End();

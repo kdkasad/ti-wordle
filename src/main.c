@@ -27,6 +27,13 @@
 #define TOP ((LCD_HEIGHT - WORDS * BOX_SIZE - (WORDS - 1) * BOX_MARGIN) / 2)
 #define LEFT ((LCD_WIDTH - WORD_LENGTH * BOX_SIZE - (WORD_LENGTH - 1) * BOX_MARGIN) / 2)
 
+/* color definitions for letter states */
+#define COLOR_NONE    LIGHTGRAY /* unsubmitted letters and empty boxes */
+#define COLOR_INVALID RED       /* invalid words */
+#define COLOR_CORRECT GREEN     /* correct letter, correct place */
+#define COLOR_PRESENT YELLOW    /* correct letter, incorrect plalce */
+#define COLOR_ABSENT  DARKGRAY  /* incorrect letter */
+
 /* function declarations */
 static int16_t binsearch(const char *word, const char **list, int16_t start, int16_t end);
 static void draw_boxes(void);
@@ -57,7 +64,7 @@ void setup(void)
 {
 	for (uint8_t i = 0; i < WORDS; i++) {
 		for (uint8_t j = 0; j < WORD_LENGTH; j++) {
-			boxes[i][j] = LIGHTGRAY;
+			boxes[i][j] = COLOR_NONE;
 			letters[i][j] = ' ';
 		}
 	}
@@ -92,10 +99,8 @@ void draw_boxes(void)
 
 void draw_letter(uint8_t i, uint8_t j, char c)
 {
-	/* set fg to white and bg to transparent */
-	gfx_SetTextFGColor(BLACK);
-	gfx_SetTextBGColor(WHITE);
-	gfx_SetTextTransparentColor(WHITE);
+	/* use black if box is light gray, otherwise use white */
+	gfx_SetTextFGColor((boxes[i][j] == LIGHTGRAY) * BLACK + (boxes[i][j] != LIGHTGRAY) * WHITE);
 
 	/* position cursor in row i box j */
 	gfx_SetTextXY(
@@ -108,7 +113,7 @@ void draw_letter(uint8_t i, uint8_t j, char c)
 void handle_correct_guess(void)
 {
 	for (uint8_t i = 0; i < WORD_LENGTH; i++)
-		boxes[y][i] = GREEN;
+		boxes[y][i] = COLOR_CORRECT;
 
 	/* draw new boxes */
 	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
@@ -123,7 +128,7 @@ void handle_correct_guess(void)
 void handle_invalid_guess(void)
 {
 	for (uint8_t i = 0; i < WORD_LENGTH; i++)
-		boxes[y][i] = RED;
+		boxes[y][i] = COLOR_INVALID;
 
 	/* draw new boxes */
 	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
@@ -143,11 +148,13 @@ void handle_incorrect_guess(void)
 	/* highlight boxes */
 	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
 		if (letters[y][i] == word[i]) {
-			boxes[y][i] = GREEN;
+			boxes[y][i] = COLOR_CORRECT;
 			freq[letters[y][i] - 'A']--;
 		} else if (freq[letters[y][i] - 'A'] > 0) {
-			boxes[y][i] = YELLOW;
+			boxes[y][i] = COLOR_PRESENT;
 			freq[letters[y][i] - 'A']--;
+		} else {
+			boxes[y][i] = COLOR_ABSENT;
 		}
 	}
 
@@ -169,10 +176,7 @@ void reveal_puzzle_word(void)
 	char msg[] = "The word is:  \0\0\0\0\0";
 	strcat(msg, word);
 
-	/* set fg to black and bg to transparent */
 	gfx_SetTextFGColor(BLACK);
-	gfx_SetTextBGColor(WHITE);
-	gfx_SetTextTransparentColor(WHITE);
 
 	gfx_PrintStringXY(msg,
 			(LCD_WIDTH - gfx_GetStringWidth(msg)) / 2,
@@ -209,7 +213,7 @@ void handle_key(char c)
 		if (last_guess_invalid) {
 			last_guess_invalid = false;
 			for (uint8_t i = 0; i < WORD_LENGTH; i++) {
-				boxes[y][i] = LIGHTGRAY;
+				boxes[y][i] = COLOR_NONE;
 				fill_box(y, i);
 				draw_letter(y, i, letters[y][i]);
 			}
@@ -221,7 +225,7 @@ void handle_key(char c)
 		last_guess_invalid = false;
 		for (x = 0; x < WORD_LENGTH; x++) {
 			letters[y][x] = ' ';
-			boxes[y][x] = LIGHTGRAY;
+			boxes[y][x] = COLOR_NONE;
 			fill_box(y, x);
 		}
 		x = 0;
@@ -281,6 +285,8 @@ int main(void)
 	gfx_SetTextConfig(gfx_text_noclip);
 	gfx_SetTextScale(2, 2);
 	gfx_SetMonospaceFont(0);
+	gfx_SetTextBGColor(TRANSPARENT);
+	gfx_SetTextTransparentColor(TRANSPARENT);
 
 	/* clear screen */
 	gfx_FillScreen(WHITE);

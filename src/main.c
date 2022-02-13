@@ -189,6 +189,8 @@ void reveal_puzzle_word(void)
 #define HKEY_CLEAR '\x03'
 void handle_key(char c)
 {
+	if (y == WORDS)
+		return;
 
 	if (c == HKEY_ENTER) { /* enter is pressed */
 		if (x == WORD_LENGTH) {
@@ -229,8 +231,6 @@ void handle_key(char c)
 		/* letter A-Z */
 
 		if (x == WORD_LENGTH)
-			return;
-		if (y == WORDS)
 			return;
 		letters[y][x] = c;
 		draw_letter(y, x, c);

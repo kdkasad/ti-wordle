@@ -1,8 +1,14 @@
-Must fix:
+Will do:
 
 	- Document functions in sources
 
-Probably won't fix:
+	- Allow playing again by pressing [clear] when the game is over
+
+Might do:
+
+	- Add delay when revealing each letter's status (like in original Wordle)
+
+Probably won't do:
 
 	- Implement piecewise compression of valid word list to allow for all
 	  10k+ possible words

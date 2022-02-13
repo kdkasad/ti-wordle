@@ -161,6 +161,11 @@ void handle_incorrect_guess(void)
 		if (letters[y][i] == word[i]) {
 			boxes[y][i] = COLOR_CORRECT;
 			freq[letters[y][i] - 'A']--;
+		}
+	}
+	for (uint8_t i = 0; i < WORD_LENGTH; i++) {
+		if (boxes[y][i] == COLOR_CORRECT) {
+			continue;
 		} else if (freq[letters[y][i] - 'A'] > 0) {
 			boxes[y][i] = COLOR_PRESENT;
 			freq[letters[y][i] - 'A']--;

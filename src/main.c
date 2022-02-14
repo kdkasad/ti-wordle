@@ -375,6 +375,40 @@ game_start:
 	print_title();
 	draw_boxes();
 
+#ifdef DEBUG
+	word = "DRYER";
+	handle_key('P');
+	handle_key('A');
+	handle_key('N');
+	handle_key('E');
+	handle_key('L');
+	handle_key(HKEY_ENTER);
+	handle_key('C');
+	handle_key('R');
+	handle_key('E');
+	handle_key('E');
+	handle_key('P');
+	handle_key(HKEY_ENTER);
+	handle_key('T');
+	handle_key('R');
+	handle_key('I');
+	handle_key('E');
+	handle_key('D');
+	handle_key(HKEY_ENTER);
+	handle_key('O');
+	handle_key('R');
+	handle_key('D');
+	handle_key('E');
+	handle_key('R');
+	handle_key(HKEY_ENTER);
+	handle_key('D');
+	handle_key('R');
+	handle_key('Y');
+	handle_key('E');
+	handle_key('R');
+	handle_key(HKEY_ENTER);
+#endif
+
 	sk_key_t c;
 	while ((c = os_GetCSC()) != sk_2nd) {
 		if (c == sk_Enter)

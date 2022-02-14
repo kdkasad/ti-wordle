@@ -2,6 +2,8 @@ Will do:
 
 	- Document functions in sources
 
+	- Display version number in UI
+
 Might do:
 
 	- Add delay when revealing each letter's status (like in original Wordle)

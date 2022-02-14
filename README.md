@@ -14,6 +14,8 @@
 A clone of [Wordle](https://powerlanguage.co.uk/wordle/) for TI-84/83 graphing
 calculators.
 
+![game screenshot](https://raw.githubusercontent.com/kdkasad/ti-wordle/docs/images/screen.png)
+
 ## Downloading the program
 
 The compiled binary for TI Wordle is available on the [releases

@@ -48,6 +48,7 @@ will automatically translate keypresses to letters.
 | `2nd`   | Quits the program                                       |
 | `del`   | Deletes one letter in the current line (like backspace) |
 | `clear` | Clears the current line                                 |
+| `clear` | Play again when game is over                            |
 | `enter` | Submits the current line as a guess                     |
 
 ### UI

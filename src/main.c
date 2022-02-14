@@ -90,8 +90,6 @@ void setup(void)
 		}
 	}
 
-	srand(rtc_Time());
-
 	/* pick random word */
 	word = puzzle_words[randInt(0, LEN(puzzle_words) - 1)];
 
@@ -342,7 +340,7 @@ int16_t binsearch(const char *word, const char **list, int16_t left, int16_t rig
 
 int main(void)
 {
-	setup();
+	srand(rtc_Time());
 
 	gfx_Begin();
 
@@ -356,8 +354,11 @@ int main(void)
 	gfx_SetTextBGColor(TRANSPARENT);
 	gfx_SetTextTransparentColor(TRANSPARENT);
 
+game_start:
 	/* clear screen */
 	gfx_FillScreen(WHITE);
+
+	setup();
 
 	print_copyright();
 	print_title();
@@ -367,9 +368,12 @@ int main(void)
 	while ((c = os_GetCSC()) != sk_2nd) {
 		if (c == sk_Enter)
 			handle_key(HKEY_ENTER);
-		else if (c == sk_Clear)
-			handle_key(HKEY_CLEAR);
-		else if (c == sk_Del)
+		else if (c == sk_Clear) {
+			if (y == WORDS)
+				goto game_start;
+			else
+				handle_key(HKEY_CLEAR);
+		} else if (c == sk_Del)
 			handle_key(HKEY_DEL);
 		else if (charmap[c] >= 'A' && charmap[c] <= 'Z')
 			handle_key(charmap[c]); /* keypress is a letter */

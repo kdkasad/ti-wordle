@@ -30,12 +30,13 @@
 #define DEFAULT_LETTER_HEIGHT 8
 
 /* UI sizes */
-#define BOX_SIZE            26
-#define BOX_MARGIN          4
 #define FONT_SCALE          3
-#define LETTER_HEIGHT       (FONT_SCALE * DEFAULT_LETTER_HEIGHT)
+#define LETTER_HEIGHT       (FONT_SCALE * (DEFAULT_LETTER_HEIGHT - 1))
 #define SMALL_FONT_SCALE    2
 #define SMALL_LETTER_HEIGHT (SMALL_FONT_SCALE * DEFAULT_LETTER_HEIGHT)
+#define BOX_SIZE            26
+#define BOX_MARGIN          4
+#define BOX_PADDING         ((BOX_SIZE - LETTER_HEIGHT) / 2)
 
 /* Define word parameters */
 #define WORD_LENGTH 5
@@ -118,13 +119,23 @@ void draw_boxes(void)
 
 void draw_letter(uint8_t i, uint8_t j, char c)
 {
+	int8_t offset = 0;
+
 	/* use black if box is light gray, otherwise use white */
 	gfx_SetTextFGColor((boxes[i][j] == LIGHTGRAY) * BLACK + (boxes[i][j] != LIGHTGRAY) * WHITE);
 
+	/* some letters need a manual offset to look correct */
+	switch (c) {
+	case 'T':
+	case 'I':
+		offset = -1;
+		break;
+	}
+
 	/* position cursor in row i box j */
 	gfx_SetTextXY(
-			LEFT + j * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - gfx_GetCharWidth(c)) / 2 + 1,
-			TOP + i * (BOX_SIZE + BOX_MARGIN) + (BOX_SIZE - LETTER_HEIGHT) / 2 + 1
+			LEFT + j * (BOX_SIZE + BOX_MARGIN) + BOX_PADDING + offset,
+			TOP + i * (BOX_SIZE + BOX_MARGIN) + BOX_PADDING
 		     );
 	gfx_PrintChar(c);
 }

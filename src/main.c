@@ -235,12 +235,22 @@ void clear_status_message(void)
 
 void print_title(void)
 {
+	unsigned int title_w;
 	clear_status_message();
+
+	/* print title */
+	title_w = gfx_GetStringWidth(TITLE);
 	gfx_SetTextFGColor(BLACK);
 	gfx_PrintStringXY(TITLE,
-			(LCD_WIDTH - gfx_GetStringWidth(TITLE)) / 2,
-			TOP / 2 - LETTER_HEIGHT / 2
-			);
+			(LCD_WIDTH - title_w) / 2,
+			(TOP - LETTER_HEIGHT) / 2);
+
+	/* print version number */
+	gfx_SetTextScale(1, 1);
+	gfx_PrintStringXY(VERSION,
+			(LCD_WIDTH + title_w) / 2 + 2,
+			(TOP + LETTER_HEIGHT) / 2 - DEFAULT_LETTER_HEIGHT);
+	gfx_SetTextScale(FONT_SCALE, FONT_SCALE);
 }
 
 void print_copyright(void)

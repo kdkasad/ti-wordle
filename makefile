@@ -11,6 +11,7 @@
 
 NAME = WORDLE
 TITLE = TI WORDLE
+VERSION = v1.1.0
 AUTHOR = Kian Kasad
 YEAR = 2022
 
@@ -19,7 +20,11 @@ DESCRIPTION = "Wordle"
 COMPRESSED = YES
 ARCHIVED = NO
 
-METADATA_CFLAGS = -DPROGNAME="\"$(NAME)\"" -DTITLE="\"$(TITLE)\"" -DAUTHOR="\"$(AUTHOR)\"" -DYEAR="\"$(YEAR)\""
+METADATA_CFLAGS = -DPROGNAME="\"$(NAME)\"" \
+		  -DTITLE="\"$(TITLE)\"" \
+		  -DVERSION="\"$(VERSION)\"" \
+		  -DAUTHOR="\"$(AUTHOR)\"" \
+		  -DYEAR="\"$(YEAR)\""
 
 CFLAGS = -Wall -Wextra -pedantic -Oz $(METADATA_CFLAGS)
 CXXFLAGS = -Wall -Wextra -pedantic -Oz $(METADATA_CFLAGS)

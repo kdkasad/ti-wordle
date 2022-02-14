@@ -38,6 +38,10 @@ jobs:
         run: |
           tar -zxf ${{ steps.cedev-download.outputs.file-path }} CEdev
 
+      - name: Add toolchain to executable path
+        run: |
+          echo "$CEDEV_PATH/bin" >> $GITHUB_PATH
+
       - name: Checkout repository (at tag)
         if: github.ref_type == 'tag'
         uses: actions/checkout@v2
@@ -50,10 +54,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ${{ env.WORDLE_PATH }}
-
-      - name: Add toolchain to executable path
-        run: |
-          echo "$CEDEV_PATH/bin" >> $GITHUB_PATH
 
       - name: Build program
         run: |

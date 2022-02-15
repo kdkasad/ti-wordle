@@ -228,9 +228,9 @@ void clear_status_message(void)
 {
 	gfx_SetColor(WHITE);
 	gfx_FillRectangle(0,
-			TOP / 2 - LETTER_HEIGHT / 2,
+			TOP / 2 - (LETTER_HEIGHT + FONT_SCALE) / 2,
 			LCD_WIDTH,
-			LETTER_HEIGHT);
+			LETTER_HEIGHT + FONT_SCALE);
 }
 
 void print_title(void)

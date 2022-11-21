@@ -37,6 +37,10 @@ Use a connection program to upload the program to a calculator using a USB cable
  - [TI Connect™](https://education.ti.com/en/products/computer-software/ti-connect-sw) (Windows)
  - [TILP](http://lpg.ticalc.org/prj_tilp/) (Linux/Windows/MacOS/UNIX)
 
+TI Wordle also requires the CE-Programming libraries to be uploaded to the
+calculator. Those can be downloaded
+[here](https://github.com/CE-Programming/libraries/releases/latest).
+
 ## Usage
 
 Once TI Wordle has been started on the calculator, you can start typing words
